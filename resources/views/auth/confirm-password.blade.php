@@ -2,10 +2,10 @@
     <!-- Logo e Título -->
     <div class="mb-6 text-center">
         <a href="/" class="inline-block">
-            <img src="{{ asset('img/logo.png') }}" class="w-28 h-auto mx-auto mb-3" alt="Logo IFES">
+            <img src="{{ asset('img/logo.png') }}" class="w-30 h-auto mx-auto mb-3" alt="Logo IFES">
         </a>
-        <h1 class="text-xl font-bold text-gray-800">Confirmação de Segurança</h1>
-        <p class="text-xs text-gray-500 mt-1">Confirme sua senha para continuar</p>
+        <h1 class="text-2xl font-bold text-black">Confirmação de Segurança</h1>
+        <p class="text-sm text-black mt-1">Confirme sua senha para continuar</p>
     </div>
 
     <div class="mb-4 text-sm text-gray-600">
