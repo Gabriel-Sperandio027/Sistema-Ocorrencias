@@ -14,17 +14,16 @@
         <!-- Token de Redefinição de Senha -->
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-        <!-- Endereço de E-mail -->
+        <!-- Endereço de E-mail (Bloqueado para edição) -->
         <div>
             <x-input-label for="email" :value="__('E-mail')" />
             <x-text-input id="email" 
-                          class="block mt-1 w-full focus:border-[#329835] focus:ring-[#329835]" 
+                          class="block mt-1 w-full bg-gray-100 cursor-not-allowed focus:border-[#329835] focus:ring-[#329835]" 
                           type="email" 
                           name="email" 
                           :value="old('email', $request->email)" 
                           required 
-                          autofocus 
-                          autocomplete="username" />
+                          readonly />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
@@ -36,6 +35,7 @@
                           type="password" 
                           name="password" 
                           required 
+                          autofocus
                           autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
