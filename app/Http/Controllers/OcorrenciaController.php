@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ocorrencia;
 use App\Models\Aluno;
 use App\Models\Turma;
-use App\Mail\OcorrenciaRegistradaMail; // Mailable do e-mail de notificação
+use App\Mail\OcorrenciaRegistradaMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -36,7 +36,7 @@ class OcorrenciaController extends Controller
     }
 
     /**
-     * Armazena uma nova ocorrência no banco de dados e envia e-mail ao responsável.
+     * Armazena uma nova ocorrência no banco de dados e enfileira o e-mail no RabbitMQ.
      */
     public function store(Request $request)
     {
@@ -53,16 +53,16 @@ class OcorrenciaController extends Controller
 
         $ocorrencia = Ocorrencia::create($validated);
 
-        // Se o checkbox de notificar estiver marcado, dispara o e-mail para o responsável
+        // Se o checkbox de notificar estiver marcado, despacha o e-mail diretamente para a fila RabbitMQ
         if ($request->has('notificar_responsavel') && $ocorrencia->aluno && $ocorrencia->aluno->email_responsavel) {
             try {
                 Mail::to($ocorrencia->aluno->email_responsavel)
-                    ->send(new OcorrenciaRegistradaMail($ocorrencia));
+                    ->queue((new OcorrenciaRegistradaMail($ocorrencia))->onConnection('rabbitmq'));
                 
-                $msgSucesso = 'Ocorrência registrada com sucesso e e-mail enviado ao responsável!';
+                $msgSucesso = 'Ocorrência registrada com sucesso e e-mail enfileirado para o responsável!';
             } catch (\Exception $e) {
-                // Em caso de falha de conexão SMTP/envio, salva o registro mas avisa sobre a falha do e-mail
-                $msgSucesso = 'Ocorrência registrada com sucesso! Porém, houve uma falha ao enviar o e-mail de notificação.';
+                // Em caso de falha de conexão com o broker, avisa no retorno
+                $msgSucesso = 'Ocorrência registrada com sucesso! Porém, houve uma falha ao conectar com o serviço de fila.';
             }
         } else {
             $msgSucesso = 'Ocorrência registrada com sucesso!';
